@@ -1,4 +1,7 @@
 import java.util.ArrayList;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -9,12 +12,35 @@ import java.util.StringTokenizer;
 import java.util.Scanner;
 import java.io.PrintWriter;
 public class app{
+  public static ArrayList<Student_data> missing_students(ArrayList<Student_data>catcourses, ArrayList<Student_data>qualtrics){
+    ArrayList<Student_data> missing = new ArrayList<Student_data>();
+    int t=0;
+    for(int i = 0; i<catcourses.size(); i++){
+      String student_email = catcourses.get(i).get_email();
+      for(int k=0; k<qualtrics.size();k++){
+        if(student_email.equals(qualtrics.get(k).get_email())){
+          t=1;
+        }
+      }
+      if(t==0){
+        missing.add(new Student_data(catcourses.get(i).get_name(),catcourses.get(i).get_email()));
+      }
+      t=0;
+    }
+    return missing;
+  }
   public static void main(String[] args){
     Scanner input = new Scanner(System.in);
-    System.out.println("Enter the CSV file for catcourses");
-    String data_cat=input.nextLine();
-    System.out.println("Enter the CSV file for Qualtrics");
-    String data_qualtrics=input.nextLine();
+    //System.out.println("Enter the CSV file for catcourses");
+    String data_cat="data/"+JOptionPane.showInputDialog(null,"Welcome to Catcourse-Qualtrics Compare Software!\n This software will output the list of missing students from Qualtrics registration. \nPlease input your Catcourse Roster");
+    if(data_cat.equals("data/"+null)){
+			 System.exit(0);
+		}
+    //System.out.println("Enter the CSV file for Qualtrics");
+    String data_qualtrics="data/"+JOptionPane.showInputDialog(null,"Please input your Qualtrics Roster");
+    if(data_qualtrics.equals("data/"+null)){
+			System.exit(0);
+		}
     ArrayList<Student_data> catcourses = new ArrayList<Student_data>();
     ArrayList<Student_data> qualtrics = new ArrayList<Student_data>();
     String name="";
@@ -86,5 +112,20 @@ public class app{
     			// TODO Auto-generated catch block
     			e.printStackTrace();
     		}
+    ArrayList<Student_data> missing = missing_students(catcourses, qualtrics);
+    String fileName = "list.txt";
+    try{
+    					 PrintWriter outputStream = new PrintWriter(fileName);
+    					 outputStream.println("List of students missing from qualtrics registration");
+               for(int a=0; a<missing.size();a++){
+                 outputStream.println(missing.get(a).toString());
+               }
+    					 outputStream.close();
+    		     }
+    		     catch(FileNotFoundException e){
+    		       e.printStackTrace();
+    		     }
+    JOptionPane.showMessageDialog(null, "Success!");
+		System.exit(0);
 }
 }
